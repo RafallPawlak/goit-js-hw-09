@@ -1,45 +1,122 @@
 import flatpickr from "flatpickr";
+import { Report } from 'notiflix/build/notiflix-report-aio';
 // Dodatkowy import stylów
 import "flatpickr/dist/flatpickr.min.css";
 
+Report.init({
+  svgSize: '30px',
+  messageFontSize: '15px',
+  });
+
 const startBtn = document.querySelector("button[data-start]");
+startBtn.insertAdjacentHTML("afterend", '<button type="button" data-stop>Stop</button>');
+const stopBtn = document.querySelector("button[data-stop]");
 const dataDays = document.querySelector("span[data-days]");
 const dataHours = document.querySelector("span[data-hours]");
 const dataMinutes = document.querySelector("span[data-minutes]");
 const dataSeconds = document.querySelector("span[data-seconds]");
 const inputDate = document.querySelector("#datetime-picker");
+const timerDesign = document.querySelector(".timer");
+const countDesign = [...document.querySelectorAll('.field')];
+const numDesign = [...document.querySelectorAll('.value')];
+const labelDesign = [...document.querySelectorAll('.label')];
+
+const inputDesign = {
+  marginLeft: "10px",
+  width: "300px",
+  height: "30px"
+}
+Object.assign(inputDate.style, inputDesign);
+
+const startBtnDesign = {
+  width: "75px",
+  height: "30px"
+}
+Object.assign(startBtn.style, startBtnDesign);
+
+const stopBtnDesign = {
+  marginLeft: "10px",
+  width: "75px",
+  height: "30px"
+}
+Object.assign(stopBtn.style, stopBtnDesign);
+
+timerDesign.style.display = "flex";
+
+countDesign.forEach((element) => {
+  const customValue = {
+    display: "flex-box",
+    marginLeft: "10px",
+    marginRight: "10px",
+    width: "80px",
+    height: "80px",
+  }
+  Object.assign(element.style, customValue)
+});
+
+numDesign.forEach((element) => {
+  const customValue = {
+    display: "flex",
+    justifyContent: "center",
+    fontFamily: "'Orbitron', sans-serif",
+    fontSize: "50px"
+  }
+  Object.assign(element.style, customValue)
+});
+
+labelDesign.forEach((element) => {
+  const customValue = {
+    display: "flex",
+    justifyContent: "center",
+    fontFamily: "'Orbitron', sans-serif",
+  }
+  Object.assign(element.style, customValue)
+});
 
 const options = {
-    enableTime: true,
-    time_24hr: true,
-    defaultDate: new Date(),
-    minuteIncrement: 1,
-    onClose(selectedDates) {
-        let actualDate = new Date();
-        if (selectedDates[0] < actualDate) {
-            window.alert("Please choose a date in the future");
-        } else {
-            startBtn.disabled = false;
-
-            startBtn.addEventListener("click", () => {
-                const timer = setInterval(() => {
-                    const ms = selectedDates[0] - actualDate;
-                        //convertMs(ms);
-                        //console.log(convertMs(ms).days);
-                    dataDays.textContent = convertMs(ms).days;
-                    dataHours.textContent = convertMs(ms).hours;
-                    dataMinutes.textContent = convertMs(ms).minutes;
-                    dataSeconds.textContent = convertMs(ms).seconds;
-                    console.log(actualDate);
-                  //  console.log(convertMs(ms));
-                }, 1000);
-              //  console.log(selectedDates[0]);
-              //  console.log(actualDate);
-            });
-        }
+  enableTime: true,
+  time_24hr: true,
+  defaultDate: new Date(),
+  minuteIncrement: 1,
+  onClose(selectedDates) {
+      
+    if (selectedDates[0] < options.defaultDate) {
+      Report.failure('Wrong date!', 'Please choose a date in the future', 'OK');
     }
-};
+    else {
+      startBtn.disabled = false;
 
+      startBtn.addEventListener("click", () => {
+        startBtn.disabled = true;
+        
+        const timer = setInterval(() => {
+          const actualDate = Date.now();
+          const ms = selectedDates[0] - actualDate;
+          dataDays.textContent = addLeadingZero(convertMs(ms).days);
+          dataHours.textContent = addLeadingZero(convertMs(ms).hours);
+          dataMinutes.textContent = addLeadingZero(convertMs(ms).minutes);
+          dataSeconds.textContent = addLeadingZero(convertMs(ms).seconds);        
+          
+          stopBtn.addEventListener("click", () => {
+            clearInterval(timer);
+            startBtn.disabled = false;
+           });  
+
+          function addLeadingZero(value) {
+            if (value.toString().length < 2) {
+              return value.toString().padStart(2, "0");
+            }
+              return value;
+            };
+
+          }, 1000);
+        });
+      
+      
+    }
+  }
+};
+      
 startBtn.disabled = true;
 
 flatpickr(inputDate, options);
@@ -50,7 +127,6 @@ function convertMs(ms) {
   const minute = second * 60;
   const hour = minute * 60;
   const day = hour * 24;
-
   // Remaining days
   const days = Math.floor(ms / day);
   // Remaining hours
@@ -62,4 +138,3 @@ function convertMs(ms) {
 
   return { days, hours, minutes, seconds };
 };
-
