@@ -104,7 +104,14 @@ const options = {
             dataSeconds.textContent === '00'
               ) {
                  clearInterval(timer);
-              } 
+          } else if (selectedDates[0] < actualDate) {
+            dataDays.textContent = '00';
+            dataHours.textContent = '00';
+            dataMinutes.textContent = '00';
+            dataSeconds.textContent = '00';
+            clearInterval(timer);
+              Report.failure('The countdown is over', 'Please select a different date', 'OK');
+              }
           stopBtn.addEventListener("click", () => {
             clearInterval(timer);
             startBtn.disabled = false;
