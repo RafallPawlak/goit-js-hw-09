@@ -95,12 +95,20 @@ const options = {
           dataDays.textContent = addLeadingZero(convertMs(ms).days);
           dataHours.textContent = addLeadingZero(convertMs(ms).hours);
           dataMinutes.textContent = addLeadingZero(convertMs(ms).minutes);
-          dataSeconds.textContent = addLeadingZero(convertMs(ms).seconds);        
+          dataSeconds.textContent = addLeadingZero(convertMs(ms).seconds); 
           
+          if (
+            dataDays.textContent === '00' &&
+            dataHours.textContent === '00' &&
+            dataMinutes.textContent === '00' &&
+            dataSeconds.textContent === '00'
+              ) {
+                 clearInterval(timer);
+              } 
           stopBtn.addEventListener("click", () => {
             clearInterval(timer);
             startBtn.disabled = false;
-           });  
+          });  
 
           function addLeadingZero(value) {
             if (value.toString().length < 2) {
